@@ -37,8 +37,7 @@ const addUser = (req, res) => {
         };
         pool.query(queries.addUser, [first_name, last_name, email, password, delivery_address], (error, results) => {
             if (error) throw error;
-            res.status(201).send("user created succesfully");
-            console.log("user added")
+            res.status(201).send("user created successfully");
         })
     })
 }

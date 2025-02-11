@@ -5,7 +5,7 @@ const addUser = "INSERT INTO users (first_name, last_name, email, password, deli
 const deleteUser = "DELETE FROM users WHERE id=$1";
 
 const updateUser = (updates, values) => {
-    return `UPDATE users SET ${updates.join(', ')} WHERE id = $${values.length} RETURNING *`;
+    return `UPDATE users SET ${updates.join(', ')}, updated_at = NOW() WHERE id = $${values.length} RETURNING *`;
 };
 
 module.exports = {
