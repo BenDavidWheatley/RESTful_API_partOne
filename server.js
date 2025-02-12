@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const  appRoutes = require('./src/app/routes/userRoutes.js')
 const productRoutes = require('./src/app/routes/productRoutes.js')
+const cartRoutes = require('./src/app/routes/cartRoutes.js'); 
 // Define our port that for the server to listen to
 const port = 3000;
 
@@ -14,7 +15,8 @@ app.get('/', (req, res) => {
 app.use(express.json());
 
 app.use('/api/v1/restfulapi/products', productRoutes); // Register products first
-app.use('/api/v1/restfulapi', appRoutes);
+app.use('/api/v1/restfulapi/cart', cartRoutes);
+app.use('/api/v1/restfulapi/user', appRoutes);
 
 
 
