@@ -28,6 +28,7 @@ const getUser = (req, res) => {
 }
 /********* ADD USER *********/
 
+/*
 const addUser = (req, res) => {
     const { first_name, last_name, email, password, delivery_address } = req.body;
 
@@ -40,7 +41,7 @@ const addUser = (req, res) => {
             res.status(201).send("user created successfully");
         })
     })
-}
+}*/
 
 /********* UPDATE USER *********/
 
@@ -117,6 +118,6 @@ module.exports = ({
     getAllUsers,
     getUser,
     updateUser,
-    addUser,
+   // addUser,
     deleteUser
 });
