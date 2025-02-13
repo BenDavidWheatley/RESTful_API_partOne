@@ -1,6 +1,7 @@
 const pool = require('../../../db.js');
 const queries = require('../queries/cartQueries.js');
 const userQueries = require('../queries/userQueries.js');
+const orderQueries = require('../queries/orderQueries.js');
 
 /******** CREATE OR GET ACTIVE CART FOR A USER ********/
 /* POST - http://localhost:3000/api/v1/restfulapi/cart/
@@ -222,6 +223,8 @@ Body - {
     "cart_id": 2
 }
 */
+
+/*
 const checkoutCart = (req, res) => {
     const { cart_id } = req.body;
 
@@ -231,6 +234,64 @@ const checkoutCart = (req, res) => {
             return res.status(500).json({ error: 'Internal server error' });
         }
         res.status(200).json({ message: 'Cart checked out successfully' });
+    });
+};*/
+/******** CHECKOUT CART ********/
+
+const checkoutCart = (req, res) => {
+    const { cart_id, user_id } = req.body;
+
+    console.log(`Checking out cart: ${cart_id} for user: ${user_id}`);
+
+    // Check if cart exists
+    pool.query(queries.getCartDetails, [cart_id], (error, cartResult) => {
+        if (error) {
+            console.error("Database error:", error);
+            return res.status(500).json({ error: "Internal server error getting cart details" });
+        }
+
+        if (cartResult.rows.length === 0) {
+            console.log("Cart not found or empty");
+            return res.status(404).json({ error: "Cart not found or empty" });
+        }
+
+        // Get total price of cart
+        pool.query(orderQueries.getCartTotal, [cart_id], (error, totalResult) => {
+            if (error) {
+                console.error("Database error:", error);
+                return res.status(500).json({ error: "Internal server error getting total price" });
+            }
+
+            const total_price = totalResult.rows[0]?.total_price || 0;
+
+            console.log(total_price);
+
+            // Get user's delivery address
+            pool.query(orderQueries.getUserAddress, [user_id], (error, addressResult) => {
+                if (error) {
+                    console.error("Database error:", error);
+                    return res.status(500).json({ error: "Internal server error getting users address" });
+                }
+
+                if (addressResult.rows.length === 0) {
+                    return res.status(404).json({ error: "User address not found" });
+                }
+
+                const delivery_address = addressResult.rows[0].delivery_address;
+
+                console.log(delivery_address);
+                // Insert order into orders table
+                pool.query(orderQueries.createOrder, [user_id, cart_id, total_price, delivery_address], (error, orderResult) => {
+                    if (error) {
+                        console.error("Database error:", error);
+                        return res.status(500).json({ error: "Internal server error creating the order" });
+                    }
+
+                    console.log("Order created successfully");
+                    return res.status(201).json({ message: "Order placed successfully", order: orderResult.rows[0] });
+                }); 
+            }); 
+        });
     });
 };
 
