@@ -1,3 +1,13 @@
+/* ORDER QUERIES */
+/* 
+1 - Get total price of cart
+2 - Get user's delivery address
+3 - Insert order into orders table
+4 - Get order details (to find cart_id)
+5 - Move cart items to order_items
+6 - Update order status
+7 - Clear cart items after checkout
+*/
 /* Get total price of cart */
 const getCartTotal = `
     SELECT SUM(p.price * ci.quantity) AS total_price
@@ -8,7 +18,7 @@ const getCartTotal = `
 
 /* Get user's delivery address */
 const getUserAddress = `
-    SELECT delivery_address 
+    SELECT delivery_address
     FROM users 
     WHERE id = $1`;
 
@@ -44,6 +54,12 @@ const clearCartItems = `
     DELETE FROM cart_items 
     WHERE cart_id = $1`;
 
+/* Get all orders*/ 
+const getAllOrders = `
+    SELECT *
+    FROM orders
+`;
+  
 module.exports = {
     getCartTotal,
     getUserAddress,
@@ -51,5 +67,6 @@ module.exports = {
     getOrderDetails,
     moveCartToOrderItems,
     updateOrderStatus,
-    clearCartItems
+    clearCartItems,
+    getAllOrders
 }

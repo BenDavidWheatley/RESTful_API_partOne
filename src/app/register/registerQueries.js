@@ -1,3 +1,4 @@
+
 const checkUserExists = `SELECT * FROM users WHERE email = $1;`;
 
 const registerUser = `

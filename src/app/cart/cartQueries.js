@@ -1,4 +1,20 @@
-/* Check if user has a cart and is active */
+/********* QUERY OPTIONS ********/
+
+/*
+1 - Check if user has a cart and is active
+2 - Create a cart in the database for user
+3 - Get all the carts for a specified user
+4 - Check if a cart exists 
+5 - Add or update an item 
+6 - Get details of a cart
+7 - Get item in a cart
+8 - Update the item in the cart
+9 - Remove the item in the cart
+10 - Complete cart - THIS WILL BE MOVED TO ORDERSCONTROLLER 
+*/
+
+
+/* 1 - Check if user has a cart and is active */
 const getActiveCart = `
     SELECT * 
     FROM cart 
@@ -7,14 +23,14 @@ const getActiveCart = `
     LIMIT 1;
 `;
 
-/* Create a cart in the database for user */
+/* 2 - Create a cart in the database for user */
 const createCart = `
     INSERT INTO cart (user_id) 
     VALUES ($1) 
     RETURNING *;
 `;
 
-/* Get all the carts for a specified user */
+/* 3 - Get all the carts for a specified user */
 const getUserCarts = `
     SELECT 
         users.id AS user_id, 
@@ -41,12 +57,12 @@ const getUserCarts = `
 
 `;
 
-/* Check if a cart exists */
+/* 4 - Check if a cart exists */
 const checkForCart = `
     SELECT * FROM cart 
     WHERE id = $1`;
 
-/* Add or update an item */
+/* 5 - Add or update an item */
 const addOrUpdateItem = `
     INSERT INTO cart_items (cart_id, product_id, quantity) 
     VALUES ($1, $2, $3) 
@@ -55,7 +71,7 @@ const addOrUpdateItem = `
     RETURNING *;
 `;
 
-/* Get details of a cart */
+/* 6 - Get details of a cart */
 const getCartDetails = `
     SELECT ci.id AS item_id, ci.cart_id, ci.product_id, p.name, p.price, ci.quantity 
     FROM cart_items ci
@@ -64,7 +80,7 @@ const getCartDetails = `
     WHERE ci.cart_id = $1;
 `;
 
-/* Get item in a cart */
+/* 7 - Get item in a cart */
 const getCartItem = `
     SELECT * 
     FROM cart_items 
@@ -72,7 +88,7 @@ const getCartItem = `
     AND product_id = $2;
 `;
 
-/* Update the item in the cart */
+/* 8 - Update the item in the cart */
 const updateCartItem = `
     UPDATE cart_items 
     SET quantity = $3 
@@ -81,7 +97,7 @@ const updateCartItem = `
     RETURNING *;
 `;
 
-/* Remove the item in the cart */
+/* 9 - Remove the item in the cart */
 const removeItem = `
     DELETE FROM cart_items 
     WHERE cart_id = $1 
@@ -89,7 +105,7 @@ const removeItem = `
     RETURNING *;
 `;
 
-/* Complete cart - THIS WILL BE MOVED TO ORDERSCONTROLLER */
+/* 10 - Complete cart - THIS WILL BE MOVED TO ORDERSCONTROLLER */
 const completeCart = `
     UPDATE cart 
     SET status = 'completed', updated_at = NOW() 

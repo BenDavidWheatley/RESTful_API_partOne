@@ -1,3 +1,13 @@
+/* PRODUCT QUERIES */
+/*
+1 - Get all products 
+2 - Get single product
+3 - Add product
+4 - Delete a product 
+5 - Update a product
+*/
+
+
 /* Get all products */
 const getAllProducts = `
     SELECT * 
@@ -12,7 +22,7 @@ const getSingleProduct = `
 /* Add product */
 const addProduct = `
     INSERT INTO products (name, description, price, inventory, updated_at) 
-    VALUES ($1,$2,$3,$4)`;
+    VALUES ($1,$2,$3,$4,$5)`;
 
 /* Delete a product */
 const deleteProduct = `

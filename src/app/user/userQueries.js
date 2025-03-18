@@ -1,3 +1,13 @@
+/* Queries foe user 
+
+1 - Select all the users
+2 - Get single user
+3 - Check if user email exists
+4 - Add user to the database
+5 - Delete user
+
+/*
+
 /* Select all the users */
 const selectAllUsers = `
     SELECT * 

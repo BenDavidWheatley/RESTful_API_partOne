@@ -1,10 +1,30 @@
 const pool = require('../../../db.js');
-const queries = require('../queries/orderQueries.js');
-const cartQuery = require('../queries/cartQueries.js');
+const queries = require('../orders/orderQueries.js');
+const cartQuery = require('../cart/cartQueries.js');
 
+/******** GET ALL ORDERS *********/
+/*
+GET - http://localhost:3000/api/v1/restfulapi/order
+*/
 
+const getAllOrders = (req, res) => {
+    pool.query(queries.getAllOrders, (error, results) => {
+        if(error){
+            console.log("Database error getting all orders", error);
+            return res.status(500).json({error: "Database error getting all orders"})
+        }
+        res.status(200).json(results.rows);
+    })
+}
 /******** COMPLETE ORDER *********/
+/*
+POST - http://localhost:3000/api/v1/restfulapi/order
+BODY 
+{
+"order_id" : 1
+}
 
+*/
 const completeOrder = (req, res) => {
     const { order_id } = req.body;
 
@@ -63,5 +83,6 @@ const completeOrder = (req, res) => {
 
 
 module.exports = {
-    completeOrder
+    completeOrder,
+    getAllOrders
 }

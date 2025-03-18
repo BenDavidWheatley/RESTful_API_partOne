@@ -1,9 +1,27 @@
+//Import required modules
 const pool = require('../../../db.js');
-const bcrypt = require('bcrypt');
-const queries = require('../queries/registerQueries.js');
-const userQueries = require("../queries/userQueries.js");
+const bcrypt = require('bcrypt'); // Used for password encryption
+const queries = require('../register/registerQueries.js');
+const userQueries = require("../user/userQueries.js");
+
+/* Register new user */
+/*
+POST http://localhost:3000/api/v1/restfulapi/register
+
+example body
+{
+    "first_name": "Ben",
+    "last_name": "Wheatley",
+    "email" : "benjy@yahoo.com",
+    "password" : "Test123",
+    "delivery_address" : "123 new street"
+} 
+
+*/
+
 
 const registerUser = (req, res) => {
+
     const { first_name, last_name, email, password, delivery_address } = req.body;
 
     console.log(req.body);
@@ -20,7 +38,7 @@ const registerUser = (req, res) => {
         }
 
         if (results.rows.length) {
-            return res.status(409).json({ error: 'Email already exists' });
+            return res.status(409).json({ error: 'User email already exists' });
         }
 
         // Hash the password before storing
