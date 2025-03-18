@@ -159,7 +159,7 @@ const updateProduct = (req, res) => {
     pool.query(query, values, (error, results) => {
         if (error) {
             console.error("Database error:", error);
-            return res.status(500).json({ error: "Database error" });
+            return res.status(500).json({ error: "Failed to update product due to server error." });
         }
 
         if (results.rowCount === 0) {
@@ -173,26 +173,53 @@ const updateProduct = (req, res) => {
 
 /******** DELETE PRODUCT *********/
 
-/*
-DELETE - http://localhost:3000/api/v1/restfulapi/products/16
-*/
-const deleteProduct = (req, res) => {
-    //Get id from the url and log to the console
-    const id = parseInt(req.params.id);
-    console.log(`the following product id has been requested for deletion : ${id}`)
+/**
+ * Deletes a product from the database by its ID.
+ * 
+ * Endpoint Example:
+ * DELETE http://localhost:3000/api/v1/restfulapi/products/{id}
+ *
+ * Responses:
+ * - 200: Product deleted successfully
+ * - 404: Product not found
+ * - 500: Internal server error
+ */
 
+const deleteProduct = (req, res) => {
+    // Extract the product ID from the request parameters
+    const id = parseInt(req.params.id);
+    console.log(`The following product ID has been requested for deletion: ${id}`);
+
+    // Check if the product exists before attempting deletion
     pool.query(queries.getSingleProduct, [id], (error, results) => {
-        const noProductFound = !results.rows.length;
-        if (noProductFound){
-            return res.send("Product does not exist");
+        // Handle potential database error during the lookup
+        if (error) {
+            console.error("Database query error:", error);
+            return res.status(500).json({ error: "Internal server error while checking product existence." });
         }
-        pool.query(queries.deleteProduct, [id], (error, results) => {
-            if(error) throw error;
-            console.log(`product id ${id} deleted`);
-            return res.status(200).send("Product deleted");
-        })
-    })
-}
+
+        // Handle case where the product does not exist
+        const noProductFound = !results.rows.length;
+        if (noProductFound) {
+            console.log(`Product with ID ${id} not found.`);
+            return res.status(404).json({ error: "Product does not exist" });
+        }
+
+        // Proceed to delete the product if found
+        pool.query(queries.deleteProduct, [id], (error) => {
+            // Handle potential database error during the deletion process
+            if (error) {
+                console.error("Error during product deletion:", error);
+                return res.status(500).json({ error: "Internal server error during product deletion." });
+            }
+
+            // Successfully deleted the product
+            console.log(`Product ID ${id} deleted successfully.`);
+            return res.status(200).json({ message: "Product deleted successfully." });
+        });
+    });
+};
+
 
 module.exports =({
     getAllProducts,

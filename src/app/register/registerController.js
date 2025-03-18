@@ -4,19 +4,20 @@ const bcrypt = require('bcrypt'); // Used for password encryption
 const queries = require('../register/registerQueries.js');
 const userQueries = require("../user/userQueries.js");
 
-/* Register new user */
+/********* REGISTER A NEW USER **********/
+
 /*
-POST http://localhost:3000/api/v1/restfulapi/register
+TYPE = POST 
+ENDPOINT = http://localhost:3000/api/v1/restfulapi/register
 
-example body
-{
-    "first_name": "Ben",
-    "last_name": "Wheatley",
-    "email" : "benjy@yahoo.com",
-    "password" : "Test123",
-    "delivery_address" : "123 new street"
-} 
-
+example body -
+    {
+        "first_name": "Ben",
+        "last_name": "Wheatley",
+        "email" : "benjy@yahoo.com",
+        "password" : "Test123",
+        "delivery_address" : "123 new street"
+    } 
 */
 
 

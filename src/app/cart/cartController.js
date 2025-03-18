@@ -213,14 +213,15 @@ Body - {
 }
 */
 const removeItemFromCart = (req, res) => {
-    // Get the requested information and log this to the console.
-    const { cart_id, product_id } = req.body;
+    const { cart_id, product_id } = req.query; // Updated to use query parameters
     console.log(`The following info has been requested to remove an item from the cart - 
         \nCart id: ${cart_id}. 
           Product ID: ${product_id}.`);
 
+    if (!cart_id || !product_id) {
+        return res.status(400).json({ error: "Both cart_id and product_id are required." });
+    }
 
-    // Check if cart exists
     pool.query(queries.getCartDetails, [cart_id], (error, result) => {
         if (error) {
             console.error('Database error:', error);
@@ -229,7 +230,7 @@ const removeItemFromCart = (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Cart not found' });
         }
-        //If the cart exists then we remove the ite from the cart
+
         pool.query(queries.removeItem, [cart_id, product_id], (error) => {
             if (error) {
                 console.error('Database error:', error);
@@ -238,8 +239,8 @@ const removeItemFromCart = (req, res) => {
             res.status(200).json({ message: 'Item removed from cart' });
         });
     });
-   
 };
+
 
 /******** CHECKOUT (Complete the Cart) ********/
 

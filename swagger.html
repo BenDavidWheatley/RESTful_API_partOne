@@ -1,0 +1,841 @@
+openapi: 3.0.3
+info:
+  title: Eccomerce RESTful API (part-one) backend
+  version: 1.0.0
+  description: >-
+    This project is a fully functional e-commerce REST API designed to support
+    key online shopping features. Users can register accounts, browse available
+    products, and perform essential CRUD operations. Built with robust
+    server-side development practices, this API serves as a strong foundation
+    for powering modern online businesses.
+paths:
+  /api/v1/restfulapi/register:
+    post:
+      summary: Registers a new user
+      description: Creates a new user account with the provided details.
+      operationId: post_register
+      tags:
+        - Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              first_name: Ben
+              last_name: Wheatley
+              email: benjy@yahoo.com
+              password: Test123
+              delivery_address: 123 new street
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              example:
+                message: User created successfully
+                user:
+                  id: 1
+                  first_name: Ben
+                  last_name: Wheatley
+                  email: benjy@yahoo.com
+                  created_at: '2025-03-18T10:00:00Z'
+        '400':
+          description: Missing required fields
+          content:
+            application/json:
+              example:
+                error: All fields are required
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              example:
+                error: User email already exists
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: Internal server error
+  /api/v1/restfulapi/user/login:
+    post:
+      summary: Logs the user in
+      description: |
+        This endpoint allows users to log in by providing their email and password. 
+        Upon successful authentication, a JWT token is generated for session management.
+      operationId: UserLogin
+      tags:
+        - User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "password123"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login successful"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      first_name:
+                        type: string
+                        example: "John"
+                      last_name:
+                        type: string
+                        example: "Doe"
+                      email:
+                        type: string
+                        example: "user@example.com"
+        '401':
+          description: Invalid login attempt - user not found or incorrect credentials
+          content:
+            application/json:
+              example:
+                error: "Incorrect password" 
+        '500':
+          description: Internal server error during authentication
+          content:
+            application/json:
+              example:
+                error: "Internal server error during authentication"
+
+  /api/v1/restfulapi/user:
+    get:
+      summary: Retrieve All Users
+      operationId: getAllUsers
+      tags:
+        - User queries
+      responses:
+        '200':
+          description: Successfully retrieved all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    email:
+                      type: string
+                    delivery_address:
+                      type: string
+  /api/v1/restfulapi/users/{id}:
+    get:
+      summary: Retrieve a Single User by ID
+      operationId: getUser
+      tags:
+        - User queries
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
+                  delivery_address:
+                    type: string
+        '404':
+          description: User not found
+          content:
+            application/json:
+              example:
+                error: User ID does not exist
+    put:
+      summary: Update an existing user
+      description: |
+        This endpoint updates a user's information. Any combination of the fields can be updated, and only provided fields will be modified. 
+        The password, if included, will be securely hashed before being stored.
+      operationId: updateUser
+      tags:
+        - User queries
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the user to update.
+          schema:
+            type: integer
+            example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  example: "Ben"
+                last_name:
+                  type: string
+                  example: "Wheatley"
+                email:
+                  type: string
+                  format: email
+                  example: "benjy@yahoo.com"
+                password:
+                  type: string
+                  format: password
+                  example: "Test123"
+                delivery_address:
+                  type: string
+                  example: "123 new street"
+      responses:
+        200:
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User updated successfully"
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 5
+                      first_name:
+                        type: string
+                        example: "Ben"
+                      last_name:
+                        type: string
+                        example: "Wheatley"
+                      email:
+                        type: string
+                        example: "benjy@yahoo.com"
+                      delivery_address:
+                        type: string
+                        example: "123 new street"
+        400:
+          description: No fields provided for update
+          content:
+            application/json:
+              example:
+                error: "No fields provided for update"
+        404:
+          description: User not found
+          content:
+            application/json:
+              example:
+                error: "User not found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: "Database error"
+    delete:
+      summary: Delete a user by ID
+      description: |
+        This endpoint deletes a user based on their unique ID. 
+        If the specified ID does not exist, a `404 Not Found` error is returned.
+      operationId: deleteUser
+      tags:
+        - User queries
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the user to delete.
+          schema:
+            type: integer
+            example: 5
+      responses:
+        200:
+          description: User deleted successfully
+          content:
+            application/json:
+              example:
+                message: "User removed successfully"
+        404:
+          description: User not found
+          content:
+            application/json:
+              example:
+                error: "User does not exist"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: "Database error"
+  /api/v1/restfulapi/products:
+    get:
+      summary: Get all products
+      description: |
+        This endpoint returns all the products from the database.
+      operationId: getAllProducts
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Successfully retrieved all products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "Wireless Mouse"
+                    description:
+                      type: string
+                      example: "Ergonomic wireless mouse with USB connectivity."
+                    price:
+                      type: string
+                      example: "29.99"
+                    inventory:
+                      type: integer
+                      example: 100
+                    created_at:
+                      type: string
+                      format: date-time
+                      example: "2025-03-18T12:34:56Z"
+                    updated_at:
+                      type: string
+                      format: date-time
+                      example: "2025-03-20T15:00:00Z"
+        '500':
+          description: Database query error
+          content:
+            application/json:
+              example:
+                error: "Database query failed"
+    post:
+      summary: Add one or multiple products
+      description: |
+        This endpoint allows adding either a **single product** or **multiple products** to the database.
+        Ensure each product includes `name`, `description`, `price`, and `inventory`.
+      operationId: addProduct
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "t-shirt"
+                    description:
+                      type: string
+                      example: "red t-shirt with logo on the sleeve"
+                    price:
+                      type: string
+                      example: "12.99"
+                    inventory:
+                      type: integer
+                      example: 200
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "hat"
+                      description:
+                        type: string
+                        example: "green wooly hat"
+                      price:
+                        type: string
+                        example: "19.99"
+                      inventory:
+                        type: integer
+                        example: 100
+      responses:
+        '201':
+          description: Product(s) added successfully
+          content:
+            application/json:
+              example: 
+                message: "Product(s) added successfully."
+        '400':
+          description: Missing required fields
+          content:
+            application/json:
+              example:
+                error: "Missing some data. Ensure all products have: name, description, price, and inventory."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: "Internal server error."
+  /api/v1/restfulapi/products{id}:
+    get:
+      summary: Retrieve a single product by ID
+      operationId: getSingleProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the product.
+          schema:
+            type: integer
+            example: 5
+      responses:
+        '200':
+          description: Succesfully retrieved single product
+          content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: "Wireless Mouse"
+                      description:
+                        type: string
+                        example: "Ergonomic wireless mouse with USB connectivity."
+                      price:
+                        type: string
+                        example: "29.99"
+                      inventory:
+                        type: integer
+                        example: 100
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2025-03-18T12:34:56Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2025-03-20T15:00:00Z"
+        '404':
+          description: Product does not exist
+          content:
+            application/json:
+              example:
+                error: "Product with an id of 1 does not exist"
+    put:
+      summary: update the information of the product
+      operationId: updateProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the product.
+          schema:
+            type: integer
+            example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Hat"
+                description:
+                  type: string
+                  example: "Green wooly hat"
+                price:
+                  type: string
+                  example: "19.99"
+                inventory:
+                  type: integer
+                  example: 200
+      responses:
+        '200':
+          description: Successfully updated the product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product updated successfully"
+                  product:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 4
+                      name:
+                        type: string
+                        example: "hat"
+                      description:
+                        type: string
+                        example: "green wooly hat"
+                      price:
+                        type: string
+                        example: "19.99"
+                      inventory:
+                        type: integer
+                        example: 100
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2025-02-11T11:17:55.221Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2025-03-18T14:18:54.662Z"
+        '400':
+          description: Bad request - Invalid data
+          content:
+            application/json:
+              example:
+                error: "No fields provided for update."
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              example:
+                error: "Product not found."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: "Failed to update product due to server error."
+    delete:
+      summary: Delete a product by id
+      description: |
+        This endpoint deletes a product based on the unique ID. 
+        If the specified ID does not exist, a `404 Not Found` error is returned.
+      operationId: deleteProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the user to delete.
+          schema:
+            type: integer
+            example: 5
+      responses:
+        200:
+          description: product deleted successfully
+          content:
+            application/json:
+              example:
+                message: "User removed successfully"
+        404:
+          description: User not found
+          content:
+            application/json:
+              example:
+                error: "User does not exist"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: "Database error"
+  /api/v1/restfulapi/cart:
+    post:
+      summary: Create or Get Active Cart
+      description: Create a new cart if none exists for the user or return the active cart.
+      operationId: createCartgetActiveCart
+      tags:
+        - Cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: Cart retrieved successfully
+        201:
+          description: New cart created
+        404:
+          description: User not found
+    get:
+      summary: Get All Carts by User ID
+      description: Retrieve all carts belonging to a specific user.
+      operationId: getCartsByUserId
+      tags:
+        - Cart
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of carts retrieved successfully
+        404:
+          description: User undefined or not found
+  /api/v1/restfulapi/cart/{cart_id}:
+    get:
+      summary: Get Cart Details
+      description: Retrieve detailed information about a specific cart.
+      operationId: getSingleCart
+      tags:
+        - Cart
+      parameters:
+        - name: cart_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Cart details returned
+        404:
+          description: Cart not found or empty
+  /api/v1/restfulapi/cart/item:
+    post:
+      summary: Add Item to Cart
+      description: Add or update an item in a user's cart.
+      operationId: addToCart
+      tags:
+        - Cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart_id:
+                  type: integer
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+      responses:
+        200:
+          description: Item added to cart successfully
+        404:
+          description: Cart not found
+    put:
+      summary: Update Cart Item Quantity
+      description: Update the quantity of a specific item in the cart.
+      operationId: updateItemInCart
+      tags:
+        - Cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart_id:
+                  type: integer
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+      responses:
+        200:
+          description: Cart item updated
+        404:
+          description: Cart or item not found
+    delete:
+      summary: Remove an item from the cart
+      description: Deletes an item from the user's cart based on the provided cart ID and product ID.
+      operationId: deleteFromCart
+      tags:
+        - Cart
+      parameters:
+        - name: cart_id
+          in: query
+          required: true
+          description: ID of the cart from which the item should be removed
+          schema:
+            type: integer
+        - name: product_id
+          in: query
+          required: true
+          description: ID of the product to remove from the cart
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Item successfully removed from the cart
+          content:
+            application/json:
+              example:
+                message: "Item removed from cart"
+        400:
+          description: Missing cart_id or product_id
+          content:
+            application/json:
+              example:
+                error: "Both cart_id and product_id are required."
+        404:
+          description: Cart or item not found
+          content:
+            application/json:
+              example:
+                error: "Cart not found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: "Internal server error"
+
+  /api/v1/restfulapi/cart/checkout:
+    post:
+      summary: Checkout Cart
+      description: Complete the cart process by converting it into an order.
+      operationId: checkoutCart
+      tags:
+        - Cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart_id:
+                  type: integer
+                user_id:
+                  type: integer
+      responses:
+        201:
+          description: Order placed successfully
+        404:
+          description: Cart not found or empty
+          
+  /api/v1/restfulapi/order:
+    get:
+      summary: Get All Orders
+      description: Retrieve all orders from the database.
+      operationId: getAllOrders
+      tags:
+        - Orders
+      responses:
+        200:
+          description: Successfully retrieved all orders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    cart_id:
+                      type: integer
+                    total:
+                      type: number
+                      format: float
+                    delivery_address:
+                      type: string
+                    delivery_status:
+                      type: string
+        500:
+          description: Database error or internal server error.
+    post:
+      summary: Complete an Order
+      description: Marks an order as completed by moving cart items to the `order_items` table and clearing the cart.
+      operationId: completeOrders
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - order_id
+              properties:
+                order_id:
+                  type: integer
+                  description: ID of the order to complete.
+      responses:
+        '200':
+          description: Order completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request or missing required parameters.
+        '404':
+          description: Order not found.
+        '500':
+          description: Internal server error during order completion.
+                  

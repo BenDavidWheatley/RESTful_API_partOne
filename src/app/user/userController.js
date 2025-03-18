@@ -12,6 +12,7 @@ const getAllUsers = (req, res) => {
             console.error('Database query error:', error);
             return res.status(500).json({ error: 'Database query failed' });
         }
+        
         res.status(200).json(results.rows);
     });
 }
