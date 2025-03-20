@@ -2,6 +2,7 @@
 const express = require('express');  // Express framework for building the app
 const session = require('express-session');  // Session middleware for managing user sessions
 const passport = require('./passportConfig.js');  // Passport.js for authentication
+const setupSwagger = require('./swaggerConfig'); // Import the Swagger config
 
 // Create an instance of an Express app
 const app = express();
@@ -39,6 +40,9 @@ app.use('/api/v1/restfulapi/products', productRoutes);  // Product management
 app.use('/api/v1/restfulapi/cart', cartRoutes);  // Shopping cart functionality
 app.use('/api/v1/restfulapi/order', orderRoutes);  // Order management
 app.use('/api/v1/restfulapi/user', userRoutes);  // User profile and data
+
+// Swagger setup 
+setupSwagger(app);
 
 // Start the server and listen on the defined port
 app.listen(port, () => {
